@@ -1,6 +1,6 @@
 from modelo.modelo import clear, registroGrupos, registroModulos,\
  registroEstudiantes, registroDocentes, registroAsistencia, consultaInformacion,\
-generacionInformes, login, cambia_contra
+generacionInformes, cambia_contra, login
 from persistencia.persistencia import cargarGrupos, cargarModulos,\
       cargarEstudiantes, cargarAsistencia, cargarDocentes
 
@@ -25,9 +25,8 @@ def menu():
     print('i. Salida del sistema.')
     print('')
     
-
-
 def ACME():
+    print('Bienvenid@!, digite su nombre de usuario y su contraseña, la contraseña predefinida es "SISGESA", en caso de haberla cambiado, ingrese su contraseña actual.')
     if login() is True:
         sw = True
         while sw:

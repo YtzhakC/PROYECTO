@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from persistencia.persistencia import guardarAsistencia, guardarDocentes, guardarEstudiantes, guardarGrupos, guardarModulos,guardar_contra,cargar_contra,hash_contra
+from persistencia.persistencia import guardarAsistencia, guardarDocentes, guardarEstudiantes, guardarGrupos, guardarModulos, guardar_contra, cargar_contra, hash_contra, contra_predefinida
 import getpass
 
 estudiantes = {}
@@ -7,6 +7,24 @@ modulos = {}
 
 def clear():
     print('\n'*100)
+
+def login():
+    input("Ingrese su nombre de usuario: ")
+    contra = getpass.getpass("Ingrese su contraseña: ")
+    if cargar_contra() is None: # Primera vez que se ejecuta el sistema
+        if contra == contra_predefinida:
+            guardar_contra(contra)
+            print("Bienvenido al sistema")
+            return True
+        else:
+            print("Contraseña incorrecta")
+            return False
+    elif hash_contra(contra) == cargar_contra():
+        print("Bienvenido al sistema")
+        return True
+    else:
+        print("Contraseña incorrecta")
+        return False
 
  # Cambia la contraseña actual
 def cambia_contra():
@@ -161,7 +179,6 @@ def consulta_estudiantes_Por_Grupo(estudiantes, grupos):
                 print(f"Código: {codigoEstudiante}, Nombre: {datos['nombreEstudiante']}")
     else:
         print('El código del grupo no existe.')
-
 
 def consulta_estudiantes_Por_Modulo(modulos, estudiantes):
     codigoModulo = input('Digite el código del módulo: \n')
