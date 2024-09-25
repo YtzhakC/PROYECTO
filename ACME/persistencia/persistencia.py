@@ -4,7 +4,7 @@ import  os
 import  hashlib
 
 contra_predefinida = "SISGESA"
-archivo_contra= "contra.txt"
+archivo_contra= "password.txt"
 def hash_contra(contra):   #Encriptar la contraseña usando SHA-256
     sha256 = hashlib.sha256()
     sha256.update(contra.encode("utf-8"))
@@ -22,35 +22,35 @@ def  cargar_contra(): #Carga la contraseña encriptada del archivo
         return None
 
 def guardarGrupos(grupos):
-    with open('ACME/json/Grupos.json', 'w') as file:
+    with open('ACME/util/registroGrupos.json', 'w') as file:
         json.dump(grupos, file, indent=4)
 
     if not file.closed:
         file.close()
 
 def guardarModulos(modulo):
-    with open('ACME/json/Modulos.json', 'w') as file:
+    with open('ACME/util/registroModulos.json', 'w') as file:
         json.dump(modulo, file, indent=4)
 
     if not file.closed:
         file.close()
 
 def guardarEstudiantes(estudiante):
-    with open('ACME/json/Estudiantes.json', 'w') as file:
+    with open('ACME/util/registroEstudiantes.json', 'w') as file:
         json.dump(estudiante, file, indent=4)
 
     if not file.closed:
         file.close()
 
 def guardarDocentes(docente):
-    with open('ACME/json/Docentes.json', 'w') as file:
+    with open('ACME/util/registroDocentes.json', 'w') as file:
         json.dump(docente, file, indent=4)
 
     if not file.closed:
         file.close()
 
 def guardarAsistencia(asistencia):
-    with open('ACME/json/Asistencia.json', 'w') as file:
+    with open('ACME/util/registroAsistencia.json', 'w') as file:
         json.dump(asistencia , file, indent=4)
 
     if not file.closed:

@@ -1,19 +1,13 @@
-from hashlib import sha256
 from datetime import datetime, timedelta
-from persistencia.persistencia import cargarEstudiantes, cargarModulos, guardarAsistencia, guardarDocentes, guardarEstudiantes, guardarGrupos, guardarModulos,guardar_contra,cargar_contra,hash_contra,contra_predefinida, cargarAsistencia, cargarDocentes, cargarGrupos
+from persistencia.persistencia import guardarAsistencia, guardarDocentes, guardarEstudiantes, guardarGrupos, guardarModulos,guardar_contra,cargar_contra,hash_contra
 import getpass
-import random
-import json
 
 estudiantes = {}
 modulos = {}
 
-
-def limpiarPantalla():
+def clear():
     print('\n'*100)
 
-
-    
  # Cambia la contraseña actual
 def cambia_contra():
     actual_contra = getpass.getpass("Ingrese la contraseña actual: ")
@@ -23,8 +17,6 @@ def cambia_contra():
         print("Contraseña cambiada con éxito")
     else:
         print("Contraseña incorrecta") 
-
-
 
 def registroGrupos(grupos):
     print('Registrar Grupo:')
@@ -39,7 +31,6 @@ def registroGrupos(grupos):
             'codigoGrupo':codigoGrupo,
             'nombreGrupo':nombreGrupo,
             'siglasGrupo':siglasGrupo,
-            
         }
 
         grupos[codigoGrupo] = grupo
@@ -161,44 +152,6 @@ def registroAsistencia(asistencia):
 
         input('El código ya está registrado, presione cualquier tecla para volver al menú...')
 
-def asignarGruposyModulos(estudiantes_json, grupos_json, modulos_json):
-    # Cargar datos desde archivos .json
-    with open('ACME/json/Estudiantes.json', 'r') as f:
-        estudiantes = json.load(f)
-    with open('ACME/json/Grupos.json', 'r') as f:
-        grupos = json.load(f)
-    with open('ACME/json/Modulos.json', 'r') as f:
-        modulos = json.load(f)
-
-    # Lista de grupos y módulos disponibles
-    lista_grupos = list(grupos.keys())
-    lista_modulos = list(modulos.keys())
-
-    for codigo_estudiante, datos_estudiante in estudiantes.items():
-        # Verificar si el estudiante ya tiene asignado un grupo
-        if datos_estudiante.get('grupo'):
-            print(f"El estudiante {datos_estudiante['nombre']} ya está asignado al grupo {datos_estudiante['grupo']}.")
-            continue  # Pasar al siguiente estudiante si ya tiene grupo
-
-        # Asignar un grupo automáticamente
-        grupo_asignado = random.choice(lista_grupos)
-        estudiantes[codigo_estudiante]['grupo'] = grupo_asignado
-        print(f"Estudiante {datos_estudiante['nombre']} asignado automáticamente al grupo {grupo_asignado}.")
-
-        # Asignar automáticamente hasta 3 módulos
-        modulos_asignados = random.sample(lista_modulos, min(3, len(lista_modulos)))  # Elegir hasta 3 módulos
-        estudiantes[codigo_estudiante]['modulos'] = modulos_asignados
-        print(f"Módulos asignados automáticamente al estudiante {datos_estudiante['nombre']}: {modulos_asignados}")
-
-    # Guardar cambios en archivos .json
-    with open('ACME/json/Estudiantes.json', 'w') as f:
-        json.dump(estudiantes, f, indent=4)
-
-    return estudiantes
-    
-
-
-
 def consulta_estudiantes_Por_Grupo(estudiantes, grupos):
     codigoGrupo = input('Digite el código del grupo: \n-> ')
     if codigoGrupo in grupos: 
@@ -262,10 +215,6 @@ def consulta_Estudiantes_Por_Docente(estudiantes, docentes, modulos):
     else:
         print('La cédula del docente no existe.')
 
-
-
-
-
 def consultaInformacion(estudiantes, modulos, grupos, docentes):
     while True:
         print("* Consulta Informacion *")
@@ -315,33 +264,6 @@ def generacionInformes(asistencia, estudiantes, modulos):
                 break
             case _:
                 print("Opción no válida.")
-'''def generacionInformes(asistencia, estudiantes, modulos):
-    while True:
-        print("* Generar Informes *")
-        opciones = {
-            "1": "Estudiantes que han llegado tarde a un módulo en un mes específico",
-            "2": "Estudiantes que se retiraron antes de la finalización de una sesión en un mes específico",
-            "3": "Estudiantes que no han faltado a ningún módulo durante un mes",
-            "4": "Porcentaje de asistencia por módulo",
-        }
-
-        for clave, valor in opciones.items():
-            print(f"{clave}. {valor}")
-
-        opcion = input(">>> Opción: ").strip()
-        if opcion in opciones:
-            if opcion == "1":
-                informe_tardanza(asistencia)
-            elif opcion == "2":
-                informe_salida_temprana(asistencia)
-            elif opcion == "3":
-                informe_asistencia_perfecta(asistencia, estudiantes)
-            elif opcion == "4":
-                informe_porcentaje_asistencia(asistencia, modulos)
-            else:
-                print("Error. Opción no válida.")
-        else:
-            print("Error. Opción no válida.")'''
 
 def informe_tardanza(asistencia):
     mes_especifico = input("Digite el mes específico (MM): ")
