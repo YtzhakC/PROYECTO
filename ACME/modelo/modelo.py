@@ -1,63 +1,72 @@
 from hashlib import sha256
 from datetime import datetime, timedelta
-from persistencia.persistencia import cargarEstudiantes, cargarModulos, guardarAsistencia, guardarDocentes, guardarEstudiantes, guardarGrupos, guardarModulos
-archModulos = 'ACME/util/registroModulos.json'
-modulos = cargarModulos(archModulos)
-archEstudiantes = 'ACME/util/registroEstudiantes.json'
-estudiantes = cargarEstudiantes(archEstudiantes)
-def clear():
+from persistencia.persistencia import cargarEstudiantes, cargarModulos, guardarAsistencia, guardarDocentes, guardarEstudiantes, guardarGrupos, guardarModulos,guardar_contra,cargar_contra,hash_contra,contra_predefinida, cargarAsistencia, cargarDocentes, cargarGrupos
+import getpass
+import random
+import json
+
+estudiantes = {}
+modulos = {}
+
+
+def limpiarPantalla():
     print('\n'*100)
 
 
-def login():
-    key = 'SISGESA'
-    pssw = str()
-    user = {}
-    user['user'] = input('Digite su nombre de usuario: \n-> ')
-    print(f'Bienvenido a SISGESA {user["user"]}, tu contraseña predefinida es: SISGESA')
-    while pssw != key:
-        print('Bienvenido al programa, a continuación, digite su nombre de usuario y la contraseña.')
-        pssw = input('Digite la contraseña: \n->')
-        if pssw == key:
-            print(f'Bienvenido, {user}.')
-            return True
-        else:
-            print('La contraseña es incorrecta, intente nuevamente.')        
+    
+ # Cambia la contraseña actual
+def cambia_contra():
+    actual_contra = getpass.getpass("Ingrese la contraseña actual: ")
+    if hash_contra(actual_contra) == cargar_contra():
+        nueva_contra = getpass.getpass("Ingrese la nueva contraseña: ")
+        guardar_contra(nueva_contra)
+        print("Contraseña cambiada con éxito")
+    else:
+        print("Contraseña incorrecta") 
 
-def codificarContrasena(password):
-    password = sha256(password.encode('utf-8')).hexdigest()
+
 
 def registroGrupos(grupos):
     print('Registrar Grupo:')
     grupo = {}
     codigoGrupo = input('Digite el codigo del grupo: \n-> ')
     if codigoGrupo not in grupos:
-        grupo['nombreGrupo'] = input('Digite el nombre del grupo: \n-> ')
-        grupo['siglaGrupo'] = input('Digite la sigla del grupo: \n-> ')
-        if len(grupo['siglaGrupo']) > 1:
-            print('Error, la sigla del grupo debe contener solo una letra.')
-            grupo['siglaGrupo'] = input('Digite la sigla del grupo: \n-> ')
+        nombreGrupo = input('Digite el nombre del grupo: \n-> ')
+        siglasGrupo = input('Digite la sigla del grupo: \n-> ')
+        if len(siglasGrupo) > 4:
+            print('Error, las siglas del grupo deben contener hasta máximo 4 letras.')
+        grupo = {
+            'codigoGrupo':codigoGrupo,
+            'nombreGrupo':nombreGrupo,
+            'siglasGrupo':siglasGrupo,
+            
+        }
 
         grupos[codigoGrupo] = grupo
         print('Hecho! Se ha registrado exitosamente el grupo.')
-        grupos = dict(sorted(grupos.items()))
+
         guardarGrupos(grupos)
     else:
-        input('El código ya existe, presione cualquier tecla para volver al menú...')
+        input('El código ya existe, volviendo al menú...')
 
 def registroModulos(modulos):
     modulo = {}
     codigoModulo = input('Digite el codigo del módulo: \n-> ')
     if codigoModulo not in modulos:
-        modulo['nombreModulo'] = input('Digite el nombre del módulo: \n-> ')
-        modulo['duracionModulo'] = int(input('Digite la duración en semanas del módulo (Digite solo números): \n-> '))
-        modulo['horaInicio'] = datetime.strptime(input('La hora de Inicio del modulo es:' ), '%H:%M')
-        modulo['horaInicio'] = datetime.strftime(modulo['horaInicio'], '%H:%M')
-        modulo['horaSalida'] = datetime.strptime(input('La hora de Salida del modulo es:' ), '%H:%M')
-        modulo['horaSalida'] = datetime.strftime(modulo['horaSalida'], '%H:%M')
+        NombreModulo = input('Digite el nombre del módulo: \n-> ')
+        DuracionModulo = int(input('Digite la duración en semanas del módulo (Digite solo números): \n-> '))
+        HoraIniciar = datetime.strptime(input('La hora de Inicio del modulo es:' ), '%H:%M')
+        HoraIniciar = datetime.strftime(HoraIniciar, '%H:%M')
+        HoraFin = datetime.strptime(input('La hora de Salida del modulo es:' ), '%H:%M')
+        HoraFin = datetime.strftime(HoraFin, '%H:%M')
+        modulo = {
+            'nombre':NombreModulo,
+            'duracion':DuracionModulo,
+            'horaInicio':HoraIniciar,
+            'horaFin':HoraFin
+        }
         modulos[codigoModulo] = modulo
         print('Hecho! Se ha registrado exitosamente el módulo.')
-        modulos = dict(sorted(modulos.items()))
         guardarModulos(modulos)
     else:
         input('El código ya existe, presione cualquier tecla para volver al menú...')
@@ -73,6 +82,8 @@ def registroEstudiantes(estudiantes):
             pass
         else:
             print('Incorrecto, el sexo solo puede ser f o m')
+        estudiante['grupo'] = input('Digite el grupo al que pertenece:  \n-> ')
+        estudiante['modulosEstudiante'] = input('Digite los modulos del grupo hasta maximo 3 y separados por comas: \n-> ').split(',')
         estudiantes[codigoEstudiante] = estudiante
         print('Hecho! Se ha registrado exitosamente el estudiante.')
         estudiantes = dict(sorted(estudiantes.items()))
@@ -80,23 +91,21 @@ def registroEstudiantes(estudiantes):
     else:
         input('El código ya existe, presione cualquier tecla para volver al menú...')
 
-def asignarGruposyModulos():
-    return
-
 def registroDocentes(docentes):
     docente = {}
     cedulaDocente = input('Digite la cédula del docente: \n-> ')
     if cedulaDocente not in docentes:
-        docente['nombreDocente'] = input('Digite el nombre del estudiante: \n-> ')
-        docente['modulosDocente'] = input("Introduce los códigos separados por comas: ").split(',')
-        docente['codigos'] = [codigo.strip() for codigo in docente['codigos']] # Limpia los espacios en blanco, si es que los hay.
-        docentes = dict(sorted(docentes.items()))
+        NombreDoc = input('Digite el nombre del estudiante: \n-> ')
+        ModsDoc = input("Introduce los códigos separados por comas: ").split(',')
+        docente = {
+            'nombre':NombreDoc,
+            'modulos':ModsDoc
+        }
         docentes[cedulaDocente] = docente
         print('Hecho! Se ha registrado exitosamente el docente.')
         guardarDocentes(docentes)
     else:
         input('El código ya existe, presione cualquier tecla para volver al menú...')
-    
 
 # Función para convertir objetos datetime a cadenas
 def convertir_tiempos_a_str(asistencia):
@@ -152,25 +161,228 @@ def registroAsistencia(asistencia):
 
         input('El código ya está registrado, presione cualquier tecla para volver al menú...')
 
+def asignarGruposyModulos(estudiantes_json, grupos_json, modulos_json):
+    # Cargar datos desde archivos .json
+    with open('ACME/json/Estudiantes.json', 'r') as f:
+        estudiantes = json.load(f)
+    with open('ACME/json/Grupos.json', 'r') as f:
+        grupos = json.load(f)
+    with open('ACME/json/Modulos.json', 'r') as f:
+        modulos = json.load(f)
 
-def consultaInformacion():
-    print('Consulta de Información')
-    print('1. Consultar los estudiantes matriculados en un grupo.')
-    print('2. Consultar los estudiantes inscritos en un módulo')
-    print('3. Consultar los docentes que imparten un módulo.')
-    print('4. Consultar los estudiantes a cargo de un docente en un módulo.')
+    # Lista de grupos y módulos disponibles
+    lista_grupos = list(grupos.keys())
+    lista_modulos = list(modulos.keys())
+
+    for codigo_estudiante, datos_estudiante in estudiantes.items():
+        # Verificar si el estudiante ya tiene asignado un grupo
+        if datos_estudiante.get('grupo'):
+            print(f"El estudiante {datos_estudiante['nombre']} ya está asignado al grupo {datos_estudiante['grupo']}.")
+            continue  # Pasar al siguiente estudiante si ya tiene grupo
+
+        # Asignar un grupo automáticamente
+        grupo_asignado = random.choice(lista_grupos)
+        estudiantes[codigo_estudiante]['grupo'] = grupo_asignado
+        print(f"Estudiante {datos_estudiante['nombre']} asignado automáticamente al grupo {grupo_asignado}.")
+
+        # Asignar automáticamente hasta 3 módulos
+        modulos_asignados = random.sample(lista_modulos, min(3, len(lista_modulos)))  # Elegir hasta 3 módulos
+        estudiantes[codigo_estudiante]['modulos'] = modulos_asignados
+        print(f"Módulos asignados automáticamente al estudiante {datos_estudiante['nombre']}: {modulos_asignados}")
+
+    # Guardar cambios en archivos .json
+    with open('ACME/json/Estudiantes.json', 'w') as f:
+        json.dump(estudiantes, f, indent=4)
+
+    return estudiantes
+    
 
 
-def generacionInformes():
 
-    return
+def consulta_estudiantes_Por_Grupo(estudiantes, grupos):
+    codigoGrupo = input('Digite el código del grupo: \n-> ')
+    if codigoGrupo in grupos: 
+        print('Estudiantes matriculados en el grupo:')
+        for codigoEstudiante, datos in estudiantes.items():
+            if datos.get('grupo') == codigoGrupo:
+                print(f"Código: {codigoEstudiante}, Nombre: {datos['nombreEstudiante']}")
+    else:
+        print('El código del grupo no existe.')
 
-def cambioContrasena(password):
-    sw = True
-    while sw:
-        confirm_pass = input('Digite la contraseña actual: \n-> ')
-        if confirm_pass == password:
-            new_password = input('Digite la nueva contraseña: \n->' )
-            password = new_password
-    return
 
+def consulta_estudiantes_Por_Modulo(modulos, estudiantes):
+    codigoModulo = input('Digite el código del módulo: \n')
+    if codigoModulo in modulos:
+        print('Estudiantes inscritos en el módulo:')
+        for estudiante, datos in estudiantes.items():
+            if datos.get('modulosEstudiante') and codigoModulo in datos['modulosEstudiante']:
+                print(f"Código: {estudiante}, Nombre: {datos['nombreEstudiante']}")
+    else:
+        print('El código del módulo no existe.')
+
+def consulta_Docentes_Por_Modulo(modulos, docentes):
+    codigoModulo = input('Digite el código del módulo: \n-> ')
+    if codigoModulo in modulos:
+        print('Docentes que imparten el módulo:')
+        for cedulaDocente, datos in docentes.items():
+            if 'modulos' in datos and codigoModulo in datos['modulos']:
+                nombre_docente = datos.get('nombre', 'Nombre no registrado')  # Si el nombre está vacío, muestra un mensaje por defecto
+                print(f"Cédula: {cedulaDocente}, Nombre: {nombre_docente}")
+    else:
+        print('El código del módulo no existe.')
+
+def consulta_Estudiantes_Por_Docente(estudiantes, docentes, modulos):
+    cedulaDocente = input('Digite la cédula del docente: \n-> ')
+    
+    # Verificar si el docente está registrado
+    if cedulaDocente in docentes:
+        # Obtener los módulos asignados al docente
+        modulos_docente = docentes[cedulaDocente].get('modulos', [])
+        
+        # Verificar si el docente tiene módulos asignados
+        if not modulos_docente:
+            print(f"El docente con cédula {cedulaDocente} no tiene módulos asignados.")
+            return
+        
+        print(f"Estudiantes a cargo del docente con cédula {cedulaDocente}:")
+        
+        # Recorrer los estudiantes para encontrar aquellos inscritos en los módulos del docente
+        for codigo_estudiante, datos_estudiante in estudiantes.items():
+            modulos_estudiante = datos_estudiante.get('modulosEstudiante', [])
+            
+            # Encontrar módulos comunes entre el docente y el estudiante
+            modulos_comunes = set(modulos_docente).intersection(set(modulos_estudiante))
+            
+            # Si hay módulos en común, mostrar la información del estudiante
+            if modulos_comunes:
+                nombre_estudiante = datos_estudiante.get('nombreEstudiante', 'Nombre no registrado')
+                modulos_nombres = [modulos[modulo]['nombre'] for modulo in modulos_comunes]
+                print(f"Código del estudiante: {codigo_estudiante}, Nombre: {nombre_estudiante}, Módulos comunes: {', '.join(modulos_nombres)}")
+    
+    else:
+        print('La cédula del docente no existe.')
+
+
+
+
+
+def consultaInformacion(estudiantes, modulos, grupos, docentes):
+    while True:
+        print("* Consulta Informacion *")
+        print('''
+                1. Consultar los estudiantes matriculados en un grupo. 
+                2. Consultar los estudiantes inscritos en un módulo. 
+                3. Consultar los docentes que imparten un módulo. 
+                4. Consultar los estudiantes a cargo de un docente en un módulo. 
+                5. Salir
+              ''')
+        opcion = input(">>> Opción: ").strip()
+        match opcion:
+            case "1":
+                consulta_estudiantes_Por_Grupo(estudiantes, grupos) 
+            case "2":
+                consulta_estudiantes_Por_Modulo(modulos, estudiantes)
+            case "3":
+                consulta_Docentes_Por_Modulo(modulos, docentes) 
+            case "4":
+                consulta_Estudiantes_Por_Docente(estudiantes, docentes, modulos) 
+            case '5':
+                break
+            case _:
+                print("Opción no válida.")
+
+def generacionInformes(asistencia, estudiantes, modulos):
+    while True:
+        print("* Consulta Informacion *")
+        print('''
+                1. Estudiantes que han llegado tarde a un módulo en un mes específico
+                2. Estudiantes que se retiraron antes de la finalización de una sesión en un mes específico
+                3. Estudiantes que no han faltado a ningún módulo durante un mes
+                4. Porcentaje de asistencia por módulo
+                5. Salir
+              ''')
+        opcion = input(">>> Opción: ").strip()
+        match opcion:
+            case "1":
+                informe_tardanza(asistencia)
+            case "2":
+                informe_salida_temprana(asistencia)
+            case "3":
+                informe_asistencia_perfecta(asistencia, estudiantes) 
+            case "4":
+                informe_porcentaje_asistencia(asistencia, estudiantes, modulos)
+            case '5':
+                break
+            case _:
+                print("Opción no válida.")
+'''def generacionInformes(asistencia, estudiantes, modulos):
+    while True:
+        print("* Generar Informes *")
+        opciones = {
+            "1": "Estudiantes que han llegado tarde a un módulo en un mes específico",
+            "2": "Estudiantes que se retiraron antes de la finalización de una sesión en un mes específico",
+            "3": "Estudiantes que no han faltado a ningún módulo durante un mes",
+            "4": "Porcentaje de asistencia por módulo",
+        }
+
+        for clave, valor in opciones.items():
+            print(f"{clave}. {valor}")
+
+        opcion = input(">>> Opción: ").strip()
+        if opcion in opciones:
+            if opcion == "1":
+                informe_tardanza(asistencia)
+            elif opcion == "2":
+                informe_salida_temprana(asistencia)
+            elif opcion == "3":
+                informe_asistencia_perfecta(asistencia, estudiantes)
+            elif opcion == "4":
+                informe_porcentaje_asistencia(asistencia, modulos)
+            else:
+                print("Error. Opción no válida.")
+        else:
+            print("Error. Opción no válida.")'''
+
+def informe_tardanza(asistencia):
+    mes_especifico = input("Digite el mes específico (MM): ")
+    modulo_especifico = input("Digite el código del módulo: ")
+    estudiantes_tarde = []
+    for estudiante, clase in asistencia.items():
+        if clase['codigoModulo'] == modulo_especifico and clase['horaEntrada'].month == int(mes_especifico):
+            if clase['puntualidad'] == 'El estudiante llego con retardo':
+                estudiantes_tarde.append(estudiante)
+    print("Estudiantes que han llegado tarde a un módulo en un mes específico:")
+    for estudiante in estudiantes_tarde:
+        print(f"Código: {estudiante}, Nombre: {estudiantes[estudiante]['nombre']}")
+
+def informe_salida_temprana(asistencia):
+    mes_especifico = input("Digite el mes específico (MM): ")
+    modulo_especifico = input("Digite el código del módulo: ")
+    estudiantes_salida_temprana = []
+    for estudiante, clase in asistencia.items():
+        if clase['codigoModulo'] == modulo_especifico and clase['horaSalida'].month == int(mes_especifico):
+            if clase['horaSalida'] < clase['horaFin']:
+                estudiantes_salida_temprana.append(estudiante)
+    print("Estudiantes que se retiraron antes de la finalización de una sesión en un mes específico:")
+    for estudiante in estudiantes_salida_temprana:
+        print(f"Código: {estudiante}, Nombre: {estudiantes[estudiante]['nombre']}")
+
+def informe_asistencia_perfecta(asistencia, estudiantes):
+    mes_especifico = input("Digite el mes específico (MM): ")
+    estudiantes_perfectos = []
+    for estudiante, datos in estudiantes.items():
+        if all(clase['puntualidad'] == 'El estudiante llego puntual.' for clase in asistencia.values() if clase['codigoEstudiante'] == estudiante and clase['horaEntrada'].month == int(mes_especifico)):
+            estudiantes_perfectos.append(estudiante)
+    print("Estudiantes que no han faltado a ningún módulo durante un mes:")
+    for estudiante in estudiantes_perfectos:
+        print(f"Código: {estudiante}, Nombre: {estudiantes[estudiante]['nombreEstudiante']}")
+
+def informe_porcentaje_asistencia(asistencia, estudiantes, modulos):
+    modulo_especifico = input("Digite el código del módulo: ")
+    total_estudiantes = len([estudiante for estudiante, datos in estudiantes.items() if modulo_especifico in datos['modulosEstudiante']])
+    asistentes = len([clase for clase in asistencia.values() if clase['codigoModulo'] == modulo_especifico and clase['puntualidad'] == 'El estudiante llego puntual.'])
+    if total_estudiantes == 0:
+        print("No hay estudiantes inscritos en este módulo.")
+    else:
+        porcentaje_asistencia = (asistentes / total_estudiantes) * 100
+        print(f"El porcentaje de asistencia del módulo {modulo_especifico} es {porcentaje_asistencia:.2f}%")
