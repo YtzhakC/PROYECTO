@@ -14,7 +14,7 @@ def guardar_contra(contra): #Guarda la contraseña encriptada en un archivo
     with open(archivo_contra, "w") as file:
         file.write(hash_contra(contra))
 
-def  cargar_contra(): #Carga la contraseña encriptada del archivo
+def cargar_contra(): #Carga la contraseña encriptada del archivo
     if os.path.exists(archivo_contra):
         with open(archivo_contra, "r") as file:
             return file.read()

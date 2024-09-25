@@ -74,11 +74,32 @@ def ACME():
                     clear()
                 case 'f':
                     clear()
-                    consultaInformacion()
+                    estudiantes = {}
+                    archEstudiantes = 'ACME/util/registroEstudiantes.json'
+                    estudiantes = cargarEstudiantes(archEstudiantes)
+                    modulos = {}
+                    archModulos = 'ACME/util/registroModulos.json'
+                    modulos = cargarModulos(archModulos)
+                    grupos = {}
+                    archGrupos = 'ACME/util/registroGrupos.json'
+                    grupos = cargarGrupos(archGrupos)
+                    docentes = {}
+                    archDocentes = 'ACME/util/registroDocentes.json'
+                    docentes = cargarDocentes(archDocentes)
+                    consultaInformacion(estudiantes, modulos, grupos, docentes)
                     clear()
                 case 'g':
                     clear()
-                    generacionInformes()
+                    modulos = {}
+                    archModulos = 'ACME/util/registroModulos.json'
+                    modulos = cargarModulos(archModulos)
+                    estudiantes = {}
+                    archEstudiantes = 'ACME/util/registroEstudiantes.json'
+                    estudiantes = cargarEstudiantes(archEstudiantes)
+                    asistencia = {}
+                    archAsistencia = 'ACME/util/registroAsistencia.json'
+                    asistencia = cargarAsistencia(archAsistencia)
+                    generacionInformes(asistencia, estudiantes, modulos)
                     clear()
                 case 'h':
                     clear()
