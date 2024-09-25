@@ -7,23 +7,14 @@ from persistencia.persistencia import cargarGrupos, cargarModulos,\
 
 def menu():
     print('a. Registro de grupos.')
-    print('')
     print('b. Registro de módulos.')
-    print('')
     print('c. Registro de estudiantes.')
-    print('')
     print('d. Registro de docentes.')
-    print('')
     print('e. Registro de asistencia.')
-    print('')
     print('f. Consultas de información')
-    print('')
     print('g. Generación de informes')
-    print('')
     print('h. Cambio de contraseña.')
-    print('')
     print('i. Salida del sistema.')
-    print('')
     
 def ACME():
     print('Bienvenid@!, digite su nombre de usuario y su contraseña, la contraseña predefinida es "SISGESA", en caso de haberla cambiado, ingrese su contraseña actual.')
